@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+import io
+import re
+
 import requests
 import tinycss2
 from tinycss2.ast import (
@@ -8,7 +11,10 @@ from tinycss2.ast import (
     LiteralToken,
     FunctionBlock,
     IdentToken,
+    NumberToken,
 )
+
+BAD = re.compile(r"[. ]+")
 
 
 def slurp(url: str):
@@ -18,14 +24,39 @@ def slurp(url: str):
         resp.content.decode("utf-8"), skip_comments=True, skip_whitespace=True
     )
     for rule in rules:
-        if isinstance(rule, AtRule) and rule.lower_at_keyword == "font-face":
-            for line in cut(rule.content):
-                assert isinstance(line[0], IdentToken)
-                assert isinstance(line[1], LiteralToken) and line[1].value == ":"
-                key = line[0].value
-                values = line[2:]
-                print(key, values)
-        print("----------------")
+        block = dict(line for line in handle_rule(rule))
+        print(file_name(block))
+
+
+def file_name(block: dict):
+    buff = io.StringIO()
+    for k in ["family", "style", "weight"]:
+        v = block["font-" + k][0]
+        if isinstance(v, NumberToken):
+            buff.write(str(int(v.value)))
+        else:
+            buff.write(BAD.sub("_", v.value))
+        buff.write("-")
+    buff.seek(buff.tell() - 1)  # removing trailing -
+    buff.write(".")
+    assert isinstance(block["src"][-1], FunctionBlock)
+    format = block["src"][-1].arguments[0].value
+    if format == "truetype":
+        buff.write("ttf")
+    else:
+        raise Exception("Unknown format:", format)
+    buff.seek(0)
+    return buff.read()
+
+
+def handle_rule(rule):
+    if isinstance(rule, AtRule) and rule.lower_at_keyword == "font-face":
+        for line in cut(rule.content):
+            assert isinstance(line[0], IdentToken)
+            assert isinstance(line[1], LiteralToken) and line[1].value == ":"
+            key = line[0].value
+            values = line[2:]
+            yield (key, values)
 
 
 def cut(content):
