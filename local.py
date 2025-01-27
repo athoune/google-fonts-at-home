@@ -25,7 +25,10 @@ def slurp(url: str):
     )
     for rule in rules:
         block = dict(line for line in handle_rule(rule))
-        print(file_name(block))
+        name = file_name(block)
+        url = block["src"][0].value
+        print(name)
+        download(url, name)
 
 
 def file_name(block: dict):
@@ -47,6 +50,13 @@ def file_name(block: dict):
         raise Exception("Unknown format:", format)
     buff.seek(0)
     return buff.read()
+
+
+def download(url, file):
+    resp = requests.get(url)
+    assert resp.status_code == 200
+    with open(file, "wb") as f:
+        f.write(resp.content)
 
 
 def handle_rule(rule):
