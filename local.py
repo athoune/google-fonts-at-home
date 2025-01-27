@@ -2,6 +2,7 @@
 
 import io
 import re
+import subprocess
 
 import requests
 import tinycss2
@@ -29,6 +30,7 @@ def slurp(url: str):
         url = block["src"][0].value
         print(name)
         download(url, name)
+        subprocess.run(["woff2_compress", name], check=True)
 
 
 def file_name(block: dict):
