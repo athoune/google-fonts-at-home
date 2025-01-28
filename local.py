@@ -30,8 +30,9 @@ def slurp(google_css_url: str, my_url_prefix: str = ""):
     )
     sources = []
     names = []
+
     for rule in rules:
-        block = dict(line for line in handle_rule(rule))
+        block = dict(line for line in atRule_to_kv(rule))
         name = file_name(block)
         print(name)
         names.append(name)
@@ -94,7 +95,7 @@ def download(url, file):
         f.write(resp.content)
 
 
-def handle_rule(rule):
+def atRule_to_kv(rule):
     if isinstance(rule, AtRule) and rule.lower_at_keyword == "font-face":
         for line in cut(rule.content):
             assert isinstance(line[0], IdentToken)
