@@ -1,4 +1,4 @@
-# Google Font local hosting
+# Google Fonts at home
 
 Google fonts is useful, but, for more privacy, you should host this fonts.
 
