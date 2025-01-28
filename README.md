@@ -9,7 +9,7 @@ Install [Google's woff2 tool](https://github.com/google/woff2).
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
+pip install .
 
 ./local.py "your google fonts CSS file" "https://fonts.example.com"
 ```
