@@ -114,7 +114,22 @@ def cut(content):
 
 
 if __name__ == "__main__":
+    import sys
+
+    if len(sys.argv) < 3:
+        print(
+            """{name} needs more arguments
+
+{name} css web_prefix
+    css : Css url provided by Google fonts
+    web_prefix: Your own domain and path, something like https://example.com/fonts
+""".format(name=sys.argv[0])
+        )
+    else:
+        slurp(sys.argv[1], sys.argv[2])
+    """
     slurp(
         "https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap",
         "https://font.example.com",
     )
+    """
